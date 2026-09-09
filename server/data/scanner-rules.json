@@ -1,0 +1,210 @@
+{
+  "_comment": "Chữ ký & quy tắc heuristic của Zeko Sentinel. Đây là phát hiện dựa trên mẫu + hành vi, KHÔNG thay thế phần mềm diệt virus hệ thống. Xem docs/SECURITY.md.",
+  "version": 20260908,
+  "thresholds": {
+    "flag": 25,
+    "review": 45,
+    "quarantine": 70
+  },
+  "signatures": [
+    {
+      "id": "ZEKO-SIG-0001",
+      "name": "RCE trong function datapack",
+      "weight": 40,
+      "severity": "high",
+      "where": "text",
+      "pattern": "/rce\\b|\\/?execute\\s+.*\\brun\\s+(cmd|powershell|curl|wget|/summon|/give|/tp|/data)",
+      "desc": "Function datapack gọi lệnh hệ thống hoặc lệnh nguy hiểm — kỹ thuật thường gặp trong 'trap pack'."
+    },
+    {
+      "id": "ZEKO-SIG-0002",
+      "name": "Command block tự chạy",
+      "weight": 30,
+      "severity": "high",
+      "where": "text",
+      "pattern": "(command_block|commandblock|/setblock|/give\\s+@\\w*\\s+(minecraft:)?command_block)[\\s\\S]{0,160}(curl|powershell|Invoke-WebRequest|bitsadmin|certutil|mshta)",
+      "desc": "Khối lệnh tải nội dung từ internet."
+    },
+    {
+      "id": "ZEKO-SIG-0003",
+      "name": "Đánh cắp phiên đăng nhập",
+      "weight": 65,
+      "severity": "critical",
+      "where": "binary",
+      "pattern": "lastlogin|launcher_accounts\\.json|\\.minecraft[/\\\\]launcher_profiles|access_token.*http",
+      "desc": "Đọc tệp phiên đăng nhập Minecraft — hành vi của launcher độc hại."
+    },
+    {
+      "id": "ZEKO-SIG-0004",
+      "name": "Đánh cắp token Discord",
+      "weight": 70,
+      "severity": "critical",
+      "where": "binary",
+      "pattern": "discord\\\\\\\\Local Storage|leveldb|discord_tokens|webhook.*discord(app)?\\.com/api/webhooks",
+      "desc": "Truy cập kho token Discord để gửi webhook."
+    },
+    {
+      "id": "ZEKO-SIG-0005",
+      "name": "Trình tải PowerShell mã hoá",
+      "weight": 60,
+      "severity": "critical",
+      "where": "text",
+      "pattern": "-enc(odedcommand)?\\s+[A-Za-z0-9+/=]{80,}|IEX\\s*\\(?New-Object\\s+Net\\.WebClient",
+      "desc": "Tải và thực thi mã từ xa bằng PowerShell."
+    },
+    {
+      "id": "ZEKO-SIG-0006",
+      "name": "Tập lệnh tự chạy trong pack",
+      "weight": 55,
+      "severity": "critical",
+      "where": "entry",
+      "pattern": "\\.(bat|cmd|ps1|vbs|vbe|js|jse|wsf|scr|exe|dll|msi|com|pif)$",
+      "desc": "Resource pack / modpack KHÔNG BAO GIỜ cần tệp thực thi. Gần như chắc chắn độc hại."
+    },
+    {
+      "id": "ZEKO-SIG-0007",
+      "name": "Nhị phân Windows trong JAR",
+      "weight": 60,
+      "severity": "critical",
+      "where": "magic",
+      "pattern": "MZ",
+      "desc": "File .jar chứa header PE (MZ) — tệp Windows thực thi bị nguỵ trang."
+    },
+    {
+      "id": "ZEKO-SIG-0008",
+      "name": "Nhị phân Linux/ELF trong JAR",
+      "weight": 55,
+      "severity": "high",
+      "where": "magic",
+      "pattern": "ELF",
+      "desc": "File .jar chứa binary ELF."
+    },
+    {
+      "id": "ZEKO-SIG-0009",
+      "name": "Tải class từ xa (Remote ClassLoader)",
+      "weight": 35,
+      "severity": "high",
+      "where": "binary",
+      "pattern": "URLClassLoader|defineClass|Unsafe\\.getUnsafe|ProcessBuilder",
+      "desc": "Mod có khả năng nạp mã từ internet lúc chạy. Có thể hợp lệ, cần xem xét."
+    },
+    {
+      "id": "ZEKO-SIG-0010",
+      "name": "Chuỗi đánh cắp mật khẩu",
+      "weight": 50,
+      "severity": "high",
+      "where": "binary",
+      "pattern": "password_stealer|grab_password|stealSession|getWindowsCredentials",
+      "desc": "Tên hàm/biến đặc trưng của mã độc đánh cắp tài khoản."
+    },
+    {
+      "id": "ZEKO-SIG-0011",
+      "name": "Rút gọn/che giấu URL",
+      "weight": 20,
+      "severity": "medium",
+      "where": "text",
+      "pattern": "(bit\\.ly|tinyurl|goo\\.gl|is\\.gd|rb\\.gy|adfly|linkvertise)/[A-Za-z0-9]+",
+      "desc": "URL rút gọn che giấu đích đến — thường dùng để phát tán tệp độc hại."
+    },
+    {
+      "id": "ZEKO-SIG-0012",
+      "name": "IP trần trong cấu hình",
+      "weight": 18,
+      "severity": "medium",
+      "where": "text",
+      "pattern": "https?://(\\d{1,3}\\.){3}\\d{1,3}(:\\d+)?/",
+      "desc": "Kết nối thẳng tới địa chỉ IP thay vì tên miền."
+    },
+    {
+      "id": "ZEKO-SIG-0013",
+      "name": "Tệp nhạy cảm hệ thống",
+      "weight": 45,
+      "severity": "high",
+      "where": "entry",
+      "pattern": "(Autorun|autorun)\\.(inf|exe)$|(^|/)desktop\\.ini$|(^|/)Startup/",
+      "desc": "Cơ chế tự khởi động cùng hệ điều hành."
+    },
+    {
+      "id": "ZEKO-SIG-0014",
+      "name": "Khoáng sản độc hại đã biết (mẫu)",
+      "weight": 80,
+      "severity": "critical",
+      "where": "entry",
+      "pattern": "(fractureiser|nekos-client|dark-rat|minecraft-rat|void-rat|dusk-rat)",
+      "desc": "Trùng tên với họ mã độc Minecraft từng được ghi nhận công khai."
+    },
+    {
+      "id": "ZEKO-SIG-0015",
+      "name": "Ghi đè vào thư mục Java",
+      "weight": 40,
+      "severity": "high",
+      "where": "entry",
+      "pattern": "(jdk|jre|java)[/\\\\].*\\.(jar|class|dll|so)$",
+      "desc": "Cố gắng ghi đè runtime Java — kỹ thuật chiếm quyền thực thi."
+    }
+  ],
+  "obfuscationSignals": [
+    "^\\d{5,}/",
+    "[a-z]/[a-z]{1,2}/[a-z0-9]{1,2}\\.(class|jar)$"
+  ],
+  "modMetadataFiles": [
+    "fabric.mod.json",
+    "mods.toml",
+    "META-INF/mods.toml",
+    "neoforge.mods.toml",
+    "META-INF/neoforge.mods.toml",
+    "quilt.mod.json",
+    "mcmod.info",
+    "plugin.yml",
+    "bukkit.yml"
+  ],
+  "allowList": [
+    "META-INF/",
+    "META-INF/MANIFEST.MF",
+    "pack.mcmeta",
+    "pack.png",
+    "assets/",
+    "data/",
+    "class_\\d+",
+    "net/minecraft/",
+    "net/fabricmc/",
+    "net/neoforged/",
+    "com/mojang/",
+    "org/lwjgl",
+    "oshi/",
+    "it/unimi/dsi/fastutil/"
+  ],
+  "ignorePaths": [
+    "screenshots/",
+    "saves/",
+    "logs/",
+    ".zeko/",
+    "crash-reports/"
+  ],
+  "scanExtensions": [
+    ".jar",
+    ".zip",
+    ".mrpack",
+    ".dat",
+    ".mcfunction",
+    ".json",
+    ".txt",
+    ".yml",
+    ".yaml",
+    ".toml",
+    ".cfg",
+    ".conf",
+    ".ini",
+    ".js",
+    ".lua",
+    ".sh",
+    ".bat",
+    ".cmd",
+    ".ps1",
+    ".vbs",
+    ".png",
+    ".class"
+  ],
+  "maxFileBytes": 52428800,
+  "maxTextPreviewBytes": 2097152
+}

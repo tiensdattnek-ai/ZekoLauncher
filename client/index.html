@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="vi" data-theme="violet" data-effects="balanced">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="description" content="Zeko Launcher — launcher Minecraft thế hệ mới: giao diện đẹp, tối ưu FPS cho máy yếu và quét an toàn tệp game." />
+    <title>Zeko Launcher — Aurora</title>
+    <link rel="icon" type="image/png" href="/assets/logo.png" />
+    <link rel="preconnect" href="/" />
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
+  <body>
+    <!-- Nền động: tắt được trong Cài đặt → Hiệu ứng -->
+    <canvas id="bg" aria-hidden="true"></canvas>
+    <div class="bg-glow" aria-hidden="true"></div>
+
+    <!-- Màn hình khởi động -->
+    <div id="boot" class="boot">
+      <img src="/assets/logo.png" alt="" class="boot-logo" width="96" height="96" />
+      <div class="boot-name">ZEKO<span>LAUNCHER</span></div>
+      <div class="boot-bar"><i></i></div>
+      <div class="boot-msg" id="boot-msg">Đang khởi động lõi Zeko…</div>
+    </div>
+
+    <div id="app" class="app" hidden>
+      <!-- ═══ THANH BÊN ═══ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="brand">
+          <img src="/assets/logo.png" alt="Zeko" width="38" height="38" />
+          <div class="brand-text">
+            <b>Zeko</b>
+            <small>Launcher <em id="brand-codename">Aurora</em></small>
+          </div>
+          <button class="icon-btn sidebar-close" id="sidebar-close" title="Đóng menu">✕</button>
+        </div>
+
+        <nav class="nav" id="nav">
+          <a href="#/dashboard" data-view="dashboard" class="nav-item">
+            <span class="nav-ico">🏠</span><span class="nav-label" data-i18n="nav.dashboard">Bảng điều khiển</span>
+          </a>
+          <a href="#/instances" data-view="instances" class="nav-item">
+            <span class="nav-ico">🧊</span><span class="nav-label" data-i18n="nav.instances">Instance</span>
+            <em class="nav-badge" id="badge-instances">0</em>
+          </a>
+          <a href="#/performance" data-view="performance" class="nav-item">
+            <span class="nav-ico">⚡</span><span class="nav-label">Zeko Turbo</span>
+          </a>
+          <a href="#/security" data-view="security" class="nav-item">
+            <span class="nav-ico">🛡️</span><span class="nav-label">Zeko Sentinel</span>
+            <em class="nav-badge danger" id="badge-threats" hidden>0</em>
+          </a>
+          <a href="#/console" data-view="console" class="nav-item">
+            <span class="nav-ico">🖥️</span><span class="nav-label">Console</span>
+          </a>
+          <a href="#/downloads" data-view="downloads" class="nav-item">
+            <span class="nav-ico">📥</span><span class="nav-label" data-i18n="nav.downloads">Tải xuống</span>
+          </a>
+          <a href="#/settings" data-view="settings" class="nav-item">
+            <span class="nav-ico">⚙️</span><span class="nav-label" data-i18n="nav.settings">Cài đặt</span>
+          </a>
+          <a href="#/about" data-view="about" class="nav-item">
+            <span class="nav-ico">💜</span><span class="nav-label">Giới thiệu</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-foot">
+          <div class="sys-mini" id="sys-mini" title="CPU / RAM hệ thống">
+            <div class="sys-row"><span>CPU</span><div class="mini-bar"><i id="mini-cpu"></i></div><b id="mini-cpu-txt">–</b></div>
+            <div class="sys-row"><span>RAM</span><div class="mini-bar"><i id="mini-ram"></i></div><b id="mini-ram-txt">–</b></div>
+          </div>
+          <div class="appver">Zeko Launcher <b id="app-version">1.0.0</b></div>
+        </div>
+      </aside>
+
+      <!-- ═══ VÙNG CHÍNH ═══ -->
+      <main class="main">
+        <header class="topbar">
+          <button class="icon-btn menu-btn" id="menu-btn" title="Menu">☰</button>
+          <div class="crumbs">
+            <h1 id="view-title">Bảng điều khiển</h1>
+            <p id="view-sub">Tổng quan hệ thống và phiên chơi gần nhất</p>
+          </div>
+          <div class="topbar-right">
+            <div class="net-pill" id="net-pill" title="Trạng thái danh mục phiên bản">
+              <i class="dot"></i><span>đang kiểm tra…</span>
+            </div>
+            <button class="icon-btn" id="btn-lang" title="Đổi ngôn ngữ">VI</button>
+            <button class="icon-btn" id="btn-effects" title="Bật/tắt hiệu ứng nền">✨</button>
+            <div class="avatar" id="avatar" title="Tài khoản">Z</div>
+          </div>
+        </header>
+
+        <section class="view-wrap" id="view-wrap">
+          <div class="view" id="view-dashboard"></div>
+        </section>
+
+        <!-- Thanh chơi game nổi -->
+        <div class="playbar" id="playbar" hidden>
+          <div class="playbar-art" id="playbar-art">🧊</div>
+          <div class="playbar-info">
+            <b id="playbar-name">—</b>
+            <small id="playbar-meta">—</small>
+            <div class="playbar-progress" id="playbar-progress" hidden><i></i><span></span></div>
+          </div>
+          <div class="playbar-actions">
+            <select id="playbar-profile" class="select tiny" title="Hồ sơ hiệu năng"></select>
+            <button class="btn ghost" id="btn-stop" hidden>Dừng</button>
+            <button class="btn primary big" id="btn-play">
+              <span class="play-ico">▶</span><span id="btn-play-text">CHƠI</span>
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ═══ TOAST ═══ -->
+    <div class="toasts" id="toasts" aria-live="polite"></div>
+
+    <!-- ═══ MODAL ═══ -->
+    <div class="modal-root" id="modal-root" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal" role="dialog" aria-modal="true" id="modal-box"></div>
+    </div>
+
+    <script type="module" src="/js/main.js"></script>
+  </body>
+</html>
