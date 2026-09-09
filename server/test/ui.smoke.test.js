@@ -117,6 +117,17 @@ test('UI: cả 8 màn hình render được, không lỗi JS', { skip: !jsdomPkg
   window.EventSource = class { constructor() {} addEventListener() {} close() {} };
   window.fetch = (url, opts) => fetch(new URL(url, BASE()).toString(), opts);
   window.navigator.clipboard = { writeText: async () => {} };
+
+  // jsdom không tải <link> ngoài nên tiêm CSS thật vào để kiểm tra được cascade.
+  const cssText = await fs.readFile(path.join(RepoRoot, 'client', 'css', 'main.css'), 'utf8');
+  const styleEl = window.document.createElement('style');
+  styleEl.textContent = cssText;
+  window.document.head.appendChild(styleEl);
+
+  // CHỐNG HỒI QUY (một phần): các phần tử phải còn thuộc tính hidden đúng lúc.
+  // (jsdom không mô hình hoá cascade UA-vs-author, nên việc author CSS đè
+  //  [hidden] được kiểm tra bằng test văn bản CSS trong core.test.js.)
+  const disp = (id) => window.getComputedStyle(window.document.getElementById(id)).display;
   window.addEventListener('error', (e) => errors.push(`window.error: ${e.error?.message || e.message}`));
   window.addEventListener('unhandledrejection', (e) => errors.push(`unhandledrejection: ${e.reason?.message || e.reason}`));
 
@@ -129,6 +140,7 @@ test('UI: cả 8 màn hình render được, không lỗi JS', { skip: !jsdomPkg
   assert.ok(!d.getElementById('boot'), 'màn hình khởi động phải được gỡ');
   assert.equal(d.getElementById('badge-instances').textContent, '2', 'badge instance phải là 2');
   assert.equal(d.getElementById('playbar').hidden, false, 'thanh CHƠI phải hiện khi đã có instance');
+
 
   const views = [
     ['dashboard', 4000],

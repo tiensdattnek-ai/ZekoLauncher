@@ -74,6 +74,11 @@ html[data-effects='full']     { --blur: 22px; }
 /* ── 2. RESET ──────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; }
+/* QUAN TRỌNG: nhiều component đặt display (grid/flex/inline-flex) mà thuộc
+   tính [hidden] chỉ dùng display:none mặc định của UA — author CSS sẽ đè lên
+   và làm modal backdrop / playbar / nút dừng LUÔN hiển thị phủ màn hình.
+   Reset này khôi phục hiệu lực của hidden trên toàn ứng dụng. */
+[hidden] { display: none !important; }
 html, body { height: 100%; }
 body {
   font-family: var(--font);

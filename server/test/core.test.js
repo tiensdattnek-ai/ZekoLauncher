@@ -219,6 +219,20 @@ test('turbo: chọn đúng Java theo phiên bản Minecraft', () => {
   assert.equal(requiredJava('1.12.2'), 8);
 });
 
+/* ── CSS: reset [hidden] ───────────────────────────────────────── */
+test('css: reset [hidden] phải tồn tại với !important (chống lỗi backdrop phủ màn hình)', async () => {
+  // Lỗi thật từng xảy ra: .modal-root/.playbar/.app đặt display (grid/flex)
+  // nên đè lên display:none mặc định của thuộc tính hidden → modal backdrop
+  // tối + hộp modal rỗng luôn phủ toàn giao diện. jsdom không mô hình hoá
+  // cascade UA-vs-author nên phải kiểm tra trực tiếp văn bản CSS.
+  const cssFile = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..', 'client', 'css', 'main.css');
+  const css = await fs.readFile(cssFile, 'utf8');
+  assert.ok(
+    /\[hidden\]\s*{[^}]*display:\s*none\s*!important/.test(css),
+    'main.css phải có luật `[hidden] { display: none !important; }`'
+  );
+});
+
 /* ── Điểm chuẩn máy ────────────────────────────────────────────── */
 test('benchmark: chạy được, cho điểm 0–1000 và đề xuất hồ sơ', async () => {
   const b = await quickBenchmark({ workDir: tmp });
