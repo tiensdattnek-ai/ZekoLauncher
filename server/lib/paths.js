@@ -14,7 +14,16 @@ import fs from 'node:fs';
 
 const HOME = os.homedir();
 
+/**
+ * Chạy trên Vercel / AWS Lambda: filesystem chỉ ghi được /tmp (tạm thời).
+ * Phát hiện qua biến môi trường đặc trưng của các nền tảng đó.
+ */
+export const IS_SERVERLESS = Boolean(
+  process.env.VERCEL || process.env.VERCEL_ENV || process.env.AWS_LAMBDA_FUNCTION_NAME
+);
+
 function defaultRoot() {
+  if (IS_SERVERLESS) return '/tmp/zekolauncher'; // nơi duy nhất ghi được, dữ liệu sống tới hết phiên function
   switch (process.platform) {
     case 'win32':
       return path.join(process.env.APPDATA || path.join(HOME, 'AppData', 'Roaming'), 'ZekoLauncher');

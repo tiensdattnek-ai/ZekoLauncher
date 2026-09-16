@@ -113,6 +113,37 @@ Dữ liệu được lưu tại:
 
 ---
 
+## ☁️ Deploy lên Vercel (bản demo trưng bày)
+
+Kho đã sẵn sàng cho Vercel: `vercel.json` + `api/index.js` bọc nguyên lõi
+Express (`server/app.js`) thành serverless function — **cùng một lõi** với chế độ
+chạy máy cá nhân.
+
+```bash
+npm i -g vercel
+vercel login          # hoặc dùng token: vercel --token <TOKEN>
+vercel --prod         # deploy từ thư mục repo
+```
+
+Hoặc nhập repo này trên vercel.com (Framework Preset: **Other**) — Vercel tự
+deploy mỗi lần push nhánh `arena/01a08005-zekolauncher`.
+
+**Hiểu đúng bản Vercel trước khi dùng:**
+
+| | Bản máy cá nhân (`npm start`) | Bản Vercel |
+|---|---|---|
+| Giao diện, Turbo, Sentinel, điểm chuẩn | ✅ | ✅ |
+| Catalog phiên bản | offline-first | ✅ (thường là `live` vì function có mạng ra) |
+| Instance / vùng cách ly | bền vững trên đĩa | ⚠️ nằm ở `/tmp` — **xoá khi function cold-start** |
+| Chạy game thật | ✅ nếu máy có Java | ❌ serverless không có Java, không giữ tiến trình |
+| SSE log/metrics | bền | ⚠️ mỗi kết nối sống ≤ `maxDuration` (60 s Hobby), trình duyệt tự nối lại |
+
+Nói ngắn: Vercel là **cửa hàng trưng bày** để bạn khoe giao diện và thử
+Sentinel/Turbo từ bất kỳ đâu; còn launcher dùng hằng ngày vẫn là bản chạy
+trên máy bạn (hoặc VPS riêng nếu muốn bền vững 24/7).
+
+---
+
 ## 🧪 Tự kiểm thử Sentinel (an toàn, không cần mã độc thật)
 
 Trong **Zeko Sentinel** hoặc trang chi tiết instance có nút **"Tạo tệp mẫu kiểm thử"**.
